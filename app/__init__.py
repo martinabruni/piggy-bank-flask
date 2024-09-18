@@ -3,13 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 from dotenv import load_dotenv
-from app.models.user import User
-from app.models.account import Account
-from app.models.category import Category
-from app.models.transaction import Transaction
-
-
-# from app.routes import main_blueprint
+from .account import routes as account
+from .category import routes as category
+from .transaction import routes as transaction
+from .user import routes as user
 
 # Load environment variables
 load_dotenv()
@@ -25,6 +22,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # app.register_blueprint(main_blueprint)
+    # Registering blueprints
+    app.register_blueprint(account.account_bp)
+    app.register_blueprint(category.category_bp)
+    app.register_blueprint(transaction.transaction_bp)
+    app.register_blueprint(user.user_bp)
 
     return app
