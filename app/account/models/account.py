@@ -1,3 +1,4 @@
+# app/account/models/account.py
 from app import db
 
 
@@ -8,4 +9,4 @@ class Account(db.Model):
     balance = db.Column(db.Float, default=0.0)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    transactions = db.relationship("Transaction", backref="account", lazy=True)
+    # transactions = db.relationship("Transaction", backxref="account", lazy=True)

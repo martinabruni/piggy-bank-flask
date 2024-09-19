@@ -1,3 +1,4 @@
+# config.py
 import os
 
 
@@ -9,4 +10,17 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SESSION_COOKIE_SECURE = True
     REMEMBER_COOKIE_SECURE = True
-    PREFERRED_URL_SCHEME = "https"
+    # PREFERRED_URL_SCHEME = "https"
+
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # In-memory database for testing
+    WTF_CSRF_ENABLED = False  # Disable CSRF for testing
+
+
+config = {
+    "development": Config,
+    "testing": TestingConfig,
+    # "production": ProductionConfig,
+}

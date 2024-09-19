@@ -1,12 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from config import Config
+from config import config
 from dotenv import load_dotenv
-from .account.routes import account_routes
-from .transaction.routes import transaction_routes
-from .category.routes import category_routes
-from .user.routes import user_routes
 from flask_bcrypt import Bcrypt
 from flask_login import (
     UserMixin,
@@ -16,7 +12,8 @@ from flask_login import (
     logout_user,
     login_required,
 )
-from flask_talisman import Talisman
+
+# from flask_talisman import Talisman
 
 # Load environment variables
 load_dotenv()
@@ -33,16 +30,21 @@ migrate = Migrate()
 bcrypt = Bcrypt()
 
 
-def create_app():
+def create_app(config_name="development"):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config[config_name])
 
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
-    Talisman(app, force_https=True)
+    # Talisman(app, force_https=True)
+
+    from .account.routes import account_routes
+    from .transaction.routes import transaction_routes
+    from .category.routes import category_routes
+    from .user.routes import user_routes
 
     # Registering blueprints
     app.register_blueprint(account_routes.account_bp)

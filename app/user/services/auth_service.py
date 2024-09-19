@@ -1,9 +1,7 @@
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
-
 from app.user.models.user import User
-from app.utils.db_utils import find_records_by_filter, add_record, delete_record
+from app.utils.db_utils import find_records_by_filter, add_record
 
 
 class AuthService:
@@ -16,11 +14,11 @@ class AuthService:
         add_record(new_user)
         return new_user
 
-    def authenticate_user(self, email: str, password: str) -> bool:
+    def authenticate_user(self, email: str, password: str) -> User:
         user = find_records_by_filter(User, email=email)
         if user:
             user = user[0]  # Assuming unique email
-            if check_password_hash(user.password_hash, password):
+            if self.bcrypt.check_password_hash(user.password_hash, password):
                 return user
         return None
 
