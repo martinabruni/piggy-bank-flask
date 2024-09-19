@@ -3,10 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 from dotenv import load_dotenv
-from .account import routes as account
-from .category import routes as category
-from .transaction import routes as transaction
-from .user import routes as user
+from .account.routes import account_routes
+from .transaction.routes import transaction_routes
+from .category.routes import category_routes
+from .user.routes import user_routes
 from flask_bcrypt import Bcrypt
 from flask_login import (
     UserMixin,
@@ -43,9 +43,9 @@ def create_app():
     bcrypt.init_app(app)
 
     # Registering blueprints
-    app.register_blueprint(account.account_bp)
-    app.register_blueprint(category.category_bp)
-    app.register_blueprint(transaction.transaction_bp)
-    app.register_blueprint(user.user_bp)
+    app.register_blueprint(account_routes.account_bp)
+    app.register_blueprint(category_routes.category_bp)
+    app.register_blueprint(transaction_routes.transaction_bp)
+    app.register_blueprint(user_routes.user_bp)
 
     return app
