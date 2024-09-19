@@ -16,6 +16,7 @@ from flask_login import (
     logout_user,
     login_required,
 )
+from flask_talisman import Talisman
 
 # Load environment variables
 load_dotenv()
@@ -36,11 +37,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    login_manager.init_app(app)
-
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
+    login_manager.init_app(app)
+
+    Talisman(app, force_https=True)
 
     # Registering blueprints
     app.register_blueprint(account_routes.account_bp)
