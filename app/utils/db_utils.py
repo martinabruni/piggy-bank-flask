@@ -1,10 +1,12 @@
-# C:app\utils\db_utils.py
 from app import db
 
 
 def add_record(record):
     """
     Add a record to the database and commit the session.
+
+    Args:
+        record: The record object to add (e.g., a User or Transaction).
     """
     db.session.add(record)
     update_record()
@@ -13,6 +15,9 @@ def add_record(record):
 def delete_record(record):
     """
     Delete a record from the database and commit the session.
+
+    Args:
+        record: The record object to delete (e.g., a User or Transaction).
     """
     db.session.delete(record)
     update_record()
@@ -48,7 +53,7 @@ def find_records_by_filter(model, **filters):
 
 def update_record():
     """
-    Commit changes to an existing record.
+    Commit changes to an existing record in the database.
     """
     try:
         db.session.commit()

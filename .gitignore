@@ -1,7 +1,9 @@
 .venv/
 .vscode/
 .env
-code.txt
+dispense/
+combined_output.txt
+script.py
 
 *.pyc
 __pycache__/

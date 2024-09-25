@@ -1,29 +1,46 @@
 import pytest
 from app import create_app, db
-from flask import template_rendered
 
 
 @pytest.fixture(scope="module")
 def test_app():
-    # Create the Flask application with the test configuration
-    app = create_app("testing")  # Assuming 'testing' configuration in Config
+    """
+    Fixture for creating the Flask test application.
+
+    Yields:
+        Flask application configured for testing.
+    """
+    app = create_app("testing")
 
     with app.app_context():
-        yield app  # Provide the application for the tests
+        yield app
 
 
 @pytest.fixture(scope="module")
 def test_client(test_app):
-    # Create a test client using the Flask application configured for testing
+    """
+    Fixture for creating the test client.
+
+    Args:
+        test_app: The test Flask application.
+
+    Returns:
+        Flask test client for sending requests to the application.
+    """
     return test_app.test_client()
 
 
 @pytest.fixture(scope="module")
 def init_database(test_app):
-    # Initialize the database
+    """
+    Fixture for initializing the test database.
+
+    Yields:
+        Initialized test database.
+    """
     db.create_all()
 
-    yield db  # Provide the database for the tests
+    yield db
 
     db.session.remove()
     db.drop_all()

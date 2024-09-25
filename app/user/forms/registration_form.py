@@ -1,11 +1,23 @@
-# app/user/form/registration_form.py
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, ValidationError, validators
-
 from app.user.models.user import User
 
 
 class registration_form(FlaskForm):
+    """
+    Registration form for creating a new user account.
+
+    Fields:
+        username (StringField): User's chosen username, required with length between 3 and 20 characters.
+        email (StringField): User's email address, required and must be unique.
+        pwd (PasswordField): User's password, required with a minimum length of 8 characters.
+        cpwd (PasswordField): Confirmation of the password, must match 'pwd'.
+
+    Methods:
+        validate_email: Custom validator to check if the email is already registered.
+        validate_uname: Custom validator to check if the username is already taken.
+    """
+
     username = StringField(
         [
             validators.InputRequired(),
@@ -13,7 +25,7 @@ class registration_form(FlaskForm):
             validators.Regexp(
                 "^[A-Za-z][A-Za-z0-9_.]*$",
                 0,
-                "Usernames must have only letters, " "numbers, dots or underscores",
+                "Usernames must have only letters, numbers, dots or underscores",
             ),
         ]
     )
