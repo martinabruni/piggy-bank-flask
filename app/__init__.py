@@ -13,8 +13,6 @@ from flask_login import (
     login_required,
 )
 
-# from flask_talisman import Talisman
-
 # Load environment variables
 load_dotenv()
 
@@ -38,8 +36,6 @@ def create_app(config_name="development"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
-
-    # Talisman(app, force_https=True)
 
     from .account.routes import account_routes
     from .transaction.routes import transaction_routes
