@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required
-from app.user.forms.login_form import login_form
-from app.user.forms.registration_form import registration_form
+from app.user.forms.login_form import LoginForm
+from app.user.forms.registration_form import RegistrationForm
 from app.user.services.auth_service import AuthService
 from app import bcrypt
 
@@ -23,7 +23,7 @@ def register():
     Returns:
         JSON response with the registration status and username.
     """
-    form = registration_form(request.form)
+    form = RegistrationForm(request.form)
     if form.validate_on_submit():
         user = auth_service.register_user(
             form.username.data, form.email.data, form.pwd.data
@@ -47,7 +47,7 @@ def login():
     Returns:
         JSON response indicating success or failure of login.
     """
-    form = login_form(request.form)
+    form = LoginForm(request.form)
     if form.validate_on_submit():
         user = auth_service.authenticate_user(form.email.data, form.pwd.data)
         if user:

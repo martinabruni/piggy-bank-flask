@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, ValidationError, validators
 
 
-class login_form(FlaskForm):
+class LoginForm(FlaskForm):
     """
     Login form for user authentication.
 

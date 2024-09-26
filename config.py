@@ -16,8 +16,9 @@ class Config:
     SECRET_KEY = os.getenv("KEY")
     SQLALCHEMY_DATABASE_URI = "sqlite:///expense_manager.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
+    WTF_CSRF_ENABLED = False
 
 
 class TestingConfig(Config):
@@ -32,7 +33,6 @@ class TestingConfig(Config):
 
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    WTF_CSRF_ENABLED = False
 
 
 config = {

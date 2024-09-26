@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, ValidationError, validators
 from app.user.models.user import User
 
 
-class registration_form(FlaskForm):
+class RegistrationForm(FlaskForm):
     """
     Registration form for creating a new user account.
 
