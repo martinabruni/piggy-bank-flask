@@ -33,6 +33,7 @@ class AuthService:
         hashed_password = self.bcrypt.generate_password_hash(password).decode("utf-8")
         new_user = User(username=username, email=email, password_hash=hashed_password)
         add_record(new_user)
+        self.login(new_user)
         return new_user
 
     def authenticate_user(self, email: str, password: str) -> User:
