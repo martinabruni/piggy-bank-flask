@@ -19,7 +19,7 @@ class RegistrationForm(FlaskForm):
     """
 
     username = StringField(
-        [
+        validators=[
             validators.InputRequired(),
             validators.Length(3, 20, message="Please provide a valid name"),
             validators.Regexp(
@@ -30,18 +30,23 @@ class RegistrationForm(FlaskForm):
         ]
     )
     email = StringField(
-        [validators.InputRequired(), validators.Email(), validators.Length(1, 64)]
+        validators=[
+            validators.InputRequired(),
+            validators.Email(),
+            validators.Length(1, 64),
+        ]
     )
     pwd = PasswordField(
-        [
+        validators=[
             validators.InputRequired(),
             validators.Length(8, 72),
         ]
     )
     cpwd = PasswordField(
-        [
+        validators=[
             validators.InputRequired(),
             validators.Length(8, 72),
+            validators.EqualTo("pwd"),
         ]
     )
 

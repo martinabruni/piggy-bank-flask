@@ -42,7 +42,7 @@ def register():
         JSON response with the registration status and username.
     """
     form = RegistrationForm(request.form)
-    if form.validate_on_submit() and (form.pwd.data == form.cpwd.data):
+    if form.validate_on_submit():
         user = auth_service.register_user(
             form.username.data, form.email.data, form.pwd.data
         )
