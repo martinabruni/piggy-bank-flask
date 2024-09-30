@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required
+from flask import Blueprint, redirect, render_template, request, jsonify, url_for
+from flask_login import current_user, login_required
 from app.user.forms.login_form import LoginForm
 from app.user.forms.registration_form import RegistrationForm
 from app.user.services.auth_service import AuthService
@@ -8,6 +8,24 @@ from app import bcrypt
 user_bp = Blueprint("user_bp", __name__)
 
 auth_service = AuthService(bcrypt)
+
+
+@user_bp.route("/", methods=["GET"])
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for("profile"))
+    return render_template("login.html")
+
+
+@user_bp.route("/profile", methods=["GET"])
+@login_required
+def profile():
+    return render_template("profile.html")
+
+
+@user_bp.route("/register", methods=["GET"])
+def register_page():
+    return render_template("register.html")
 
 
 @user_bp.route("/register", methods=["POST"])
@@ -24,7 +42,7 @@ def register():
         JSON response with the registration status and username.
     """
     form = RegistrationForm(request.form)
-    if form.validate_on_submit():
+    if form.validate_on_submit() and (form.pwd.data == form.cpwd.data):
         user = auth_service.register_user(
             form.username.data, form.email.data, form.pwd.data
         )

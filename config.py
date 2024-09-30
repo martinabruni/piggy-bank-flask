@@ -16,7 +16,7 @@ class Config:
     SECRET_KEY = os.getenv("KEY")
     SQLALCHEMY_DATABASE_URI = "sqlite:///expense_manager.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = True
     REMEMBER_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
 

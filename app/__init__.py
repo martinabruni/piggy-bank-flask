@@ -30,6 +30,15 @@ migrate = Migrate()
 bcrypt = Bcrypt()
 
 
+from app.user.models.user import User
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load a user from the database by user ID."""
+    return User.query.get(int(user_id))
+
+
 def create_app(config_name="development"):
     app = Flask(__name__)
     app.config.from_object(config[config_name])

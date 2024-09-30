@@ -32,12 +32,16 @@ class RegistrationForm(FlaskForm):
     email = StringField(
         [validators.InputRequired(), validators.Email(), validators.Length(1, 64)]
     )
-    pwd = PasswordField([validators.InputRequired(), validators.Length(8, 72)])
+    pwd = PasswordField(
+        [
+            validators.InputRequired(),
+            validators.Length(8, 72),
+        ]
+    )
     cpwd = PasswordField(
         [
             validators.InputRequired(),
             validators.Length(8, 72),
-            validators.EqualTo("pwd", message="Passwords must match !"),
         ]
     )
 
