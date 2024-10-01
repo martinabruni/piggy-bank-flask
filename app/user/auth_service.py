@@ -1,6 +1,6 @@
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, logout_user
-from app.user.models.user import User
+from app.user.user_model import User
 from app.utils.db_utils import find_records_by_filter, add_record
 
 

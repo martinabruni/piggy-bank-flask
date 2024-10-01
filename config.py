@@ -19,6 +19,7 @@ class Config:
     SESSION_COOKIE_SECURE = True
     REMEMBER_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
+    WTF_CSRF_SECRET_KEY = os.getenv("KEY")  # O usa una chiave diversa per il CSRF
 
 
 class TestingConfig(Config):

@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, jsonify, url_fo
 from flask_login import current_user, login_required
 from app.user.forms.login_form import LoginForm
 from app.user.forms.registration_form import RegistrationForm
-from app.user.services.auth_service import AuthService
+from app.user.auth_service import AuthService
 from app import bcrypt
 
 user_bp = Blueprint("user_bp", __name__)
@@ -13,7 +13,7 @@ auth_service = AuthService(bcrypt)
 @user_bp.route("/", methods=["GET"])
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for("profile"))
+        return render_template("profile.html")
     return render_template("login.html")
 
 

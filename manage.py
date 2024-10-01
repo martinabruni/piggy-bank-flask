@@ -7,7 +7,7 @@ def deploy():
     """
     from app import create_app, db
     from flask_migrate import upgrade, migrate, init, stamp
-    from app.user.models.user import User
+    from app.user.user_model import User
 
     app = create_app()
     app.app_context().push()

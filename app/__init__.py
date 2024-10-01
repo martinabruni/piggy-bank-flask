@@ -15,6 +15,10 @@ from flask_login import (
     login_required,
 )
 
+# from flask_wtf.csrf import CSRFProtect
+
+# csrf = CSRFProtect()
+
 # Load environment variables
 load_dotenv()
 
@@ -30,7 +34,7 @@ migrate = Migrate()
 bcrypt = Bcrypt()
 
 
-from app.user.models.user import User
+from app.user.user_model import User
 
 
 @login_manager.user_loader
@@ -47,11 +51,12 @@ def create_app(config_name="development"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    # csrf.init_app(app)
 
-    from .account.routes import account_routes
-    from .transaction.routes import transaction_routes
-    from .category.routes import category_routes
-    from .user.routes import user_routes
+    from .account import account_routes
+    from .transaction import transaction_routes
+    from .category import category_routes
+    from .user import user_routes
 
     # Registering blueprints
     app.register_blueprint(account_routes.account_bp)
