@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 
@@ -17,7 +18,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///expense_manager.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = True
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
     WTF_CSRF_ENABLED = False
     WTF_CSRF_SECRET_KEY = os.getenv("KEY")  # O usa una chiave diversa per il CSRF
 

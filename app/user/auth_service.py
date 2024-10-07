@@ -1,7 +1,7 @@
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, logout_user
 from app.user.user_model import User
-from app.utils.db_utils import find_records_by_filter, add_record
+from app.utils.db_utils import delete_record, find_records_by_filter, add_record
 
 
 class AuthService:
@@ -68,3 +68,27 @@ class AuthService:
         Log the user out of the system.
         """
         logout_user()
+
+    def delete_user(self, email: str):
+        """
+        Deletes a user based on the provided email.
+
+        Searches for a user with the given email. If found, the user is deleted from the
+        database. Returns `True` if deletion is successful, otherwise `False` if no user
+        is found.
+
+        Args:
+            email (str): The email address of the user to delete.
+
+        Returns:
+            bool:
+                - `True` if the user is found and deleted.
+                - `False` if no user with the provided email exists.
+        """
+        user = find_records_by_filter(User, email=email)
+        if user:
+            user = user[0]
+            delete_record(user)
+            return True
+        else:
+            return False

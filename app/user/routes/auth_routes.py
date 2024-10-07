@@ -1,5 +1,5 @@
 from app import bcrypt
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, make_response, render_template, request
 from flask_login import current_user
 
 from app.user.auth_service import AuthService
@@ -70,6 +70,8 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
     else:
+        if current_user.is_authenticated:
+            return jsonify(message="You are already logged in"), 400
         form = LoginForm(request.form)
 
         # Validate and process the login form
@@ -77,7 +79,10 @@ def login():
             user = auth_service.authenticate_user(form.email.data, form.pwd.data)
             if user:
                 auth_service.login(user)
-                return jsonify({"message": "Logged in successfully"}), 200
+                return (
+                    jsonify({"message": "Logged in successfully"}),
+                    200,
+                )
             return jsonify({"message": "Invalid email or password"}), 401
 
         return jsonify({"errors": form.errors}), 400
@@ -98,6 +103,13 @@ def logout():
     """
     if not current_user.is_authenticated:
         return jsonify({"message": "You must be logged in to logout"}), 400
-
     auth_service.logout()
     return jsonify({"message": "Logged out successfully"}), 200
+
+
+@auth_bp.route("/delete_user", methods=["DELETE"])
+def delete_user():
+    if not current_user.is_authenticated:
+        return jsonify({"message": "You must be logged in"}), 400
+    auth_service.delete_user(current_user.email)
+    return jsonify({"message": "User deleted successfully"}), 200
