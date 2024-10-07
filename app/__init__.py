@@ -51,17 +51,23 @@ def create_app(config_name="development"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+
+    from app.utils.db_commands import add_db_commands
+
+    add_db_commands(app=app)
     # csrf.init_app(app)
 
     from .account import account_routes
     from .transaction import transaction_routes
     from .category import category_routes
-    from .user import user_routes
+    from .user.routes import user_routes
+    from .user.routes import auth_routes
 
     # Registering blueprints
     app.register_blueprint(account_routes.account_bp)
     app.register_blueprint(category_routes.category_bp)
     app.register_blueprint(transaction_routes.transaction_bp)
     app.register_blueprint(user_routes.user_bp)
+    app.register_blueprint(auth_routes.auth_bp)
 
     return app
