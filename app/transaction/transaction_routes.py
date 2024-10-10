@@ -14,7 +14,14 @@ transactionService = TransactionService()
 
 
 @transaction_bp.route("/transactions", methods=["GET"])
-def accounts():
+def transactions():
+    """
+    Route to retrieve all transactions of the authenticated user.
+
+    Returns:
+        JSON response containing the user's transactions if authenticated,
+        otherwise returns an error message with a 401 Unauthorized status.
+    """
     if current_user.is_authenticated:
         return jsonify(
             user_accounts=transactionService.getUserTransactions(current_user.id)
@@ -24,7 +31,17 @@ def accounts():
 
 
 @transaction_bp.route("/transaction/<int:transaction_id>", methods=["GET"])
-def account(transaction_id: int):
+def transaction(transaction_id: int):
+    """
+    Route to retrieve a specific transaction by its ID for the authenticated user.
+
+    Args:
+        transaction_id (int): The ID of the transaction to retrieve.
+
+    Returns:
+        JSON response containing the specified user's transaction if authenticated,
+        otherwise returns an error message with a 401 Unauthorized status.
+    """
     if current_user.is_authenticated:
         return jsonify(
             user_accounts=transactionService.getThisUserTransaction(

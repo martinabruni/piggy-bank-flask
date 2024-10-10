@@ -8,6 +8,27 @@ from app.transaction.transaction_model import Transaction
 
 
 def add_db_commands(app: Flask):
+    """
+    Adds custom database commands to the Flask CLI for managing the database.
+
+    Commands:
+        - `db_create`: Creates all database tables based on the models.
+        - `db_drop`: Drops all database tables.
+        - `db_seed`: Seeds the database with sample data:
+            - Predefined categories (e.g., "Food", "Entertainment").
+            - Randomly generated accounts for two users.
+            - Random transactions associated with accounts and categories.
+
+    Args:
+        app (Flask): The Flask application instance.
+
+    Example usage:
+    ```bash
+    flask db_create   # Creates the database
+    flask db_drop     # Drops the database
+    flask db_seed     # Seeds the database with sample data
+    ```
+    """
     from app import db
 
     @app.cli.command("db_create")

@@ -45,6 +45,33 @@ def load_user(user_id):
 
 
 def create_app(config_name="development"):
+    """
+    Factory function to create and configure a Flask application.
+
+    Args:
+        config_name (str): The configuration to use (e.g., "development",
+        "production"). Defaults to "development".
+
+    Returns:
+        Flask app: A fully configured Flask application instance.
+
+    Functionality:
+    - Initializes the Flask app with the specified configuration.
+    - Sets up extensions:
+      - `db` (SQLAlchemy) for database management.
+      - `migrate` (Flask-Migrate) for handling database migrations.
+      - `bcrypt` (Flask-Bcrypt) for password hashing.
+      - `login_manager` (Flask-Login) for session and authentication management.
+      - `ma` (Marshmallow) for serialization.
+    - Registers custom database commands.
+    - Organizes routes using blueprints for:
+      - Accounts, Transactions, Categories, Users, and Authentication.
+
+    Example:
+    ```python
+    app = create_app("production")
+    ```
+    """
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
