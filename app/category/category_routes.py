@@ -15,3 +15,13 @@ catService = CategoryService()
 def categories():
     if current_user.is_authenticated:
         return jsonify(categories=catService.getCategories())
+    else:
+        return jsonify(error="User is not authenticated"), 401
+
+
+@category_bp.route("/category/<int:category_id>", methods=["GET"])
+def category(category_id: int):
+    if current_user.is_authenticated:
+        return jsonify(category=catService.getThisCategory(category_id=category_id))
+    else:
+        return jsonify(error="User is not authenticated"), 401
