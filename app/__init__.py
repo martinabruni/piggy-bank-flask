@@ -14,6 +14,7 @@ from flask_login import (
     logout_user,
     login_required,
 )
+from flask_marshmallow import Marshmallow
 
 # from flask_wtf.csrf import CSRFProtect
 
@@ -32,7 +33,7 @@ login_manager.login_message_category = "info"
 db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
-
+ma = Marshmallow()
 
 from app.user.user_model import User
 
@@ -51,7 +52,7 @@ def create_app(config_name="development"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
-
+    ma.init_app(app=app)
     from app.utils.db_commands import add_db_commands
 
     add_db_commands(app=app)

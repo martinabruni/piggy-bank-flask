@@ -16,7 +16,7 @@ class AuthService:
         """
         Initialize AuthService with a bcrypt instance.
         """
-        self.bcrypt = bcrypt
+        self.__bcrypt = bcrypt
 
     def register_user(self, username: str, email: str, password: str) -> User:
         """
@@ -30,7 +30,7 @@ class AuthService:
         Returns:
             User: The newly created user object.
         """
-        hashed_password = self.bcrypt.generate_password_hash(password).decode("utf-8")
+        hashed_password = self.__bcrypt.generate_password_hash(password).decode("utf-8")
         new_user = User(username=username, email=email, password_hash=hashed_password)
         add_record(new_user)
         self.login(new_user)
@@ -50,7 +50,7 @@ class AuthService:
         user = find_records_by_filter(User, email=email)
         if user:
             user = user[0]
-            if self.bcrypt.check_password_hash(user.password_hash, password):
+            if self.__bcrypt.check_password_hash(user.password_hash, password):
                 return user
         return None
 
