@@ -109,6 +109,17 @@ def logout():
 
 @auth_bp.route("/delete_user", methods=["DELETE"])
 def delete_user():
+    """
+    Route to delete the currently authenticated user.
+
+    This route deletes the user associated with the current session, based on
+    their email. The user must be authenticated to perform this action.
+
+    Returns:
+        JSON response:
+            - Success: A message confirming that the user was deleted.
+            - Failure: An error message if the user is not logged in.
+    """
     if not current_user.is_authenticated:
         return jsonify({"message": "You must be logged in"}), 400
     auth_service.delete_user(current_user.email)

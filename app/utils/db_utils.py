@@ -37,7 +37,7 @@ def find_record_by_id(model, record_id):
     return model.query.get(record_id)
 
 
-def find_records_by_filter(model, **filters):
+def find_records_by_filter(model, **filters) -> list:
     """
     Find records that match given filter criteria.
 
