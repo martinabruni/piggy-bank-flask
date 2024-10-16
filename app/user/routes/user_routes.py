@@ -10,10 +10,13 @@ from flask import (
 from flask_login import current_user, login_required, logout_user
 from app.user.forms.login_form import LoginForm
 from app.user.forms.registration_form import RegistrationForm
-from app.user.auth_service import AuthService
+from app.user.services.auth_service import AuthService
 from app import bcrypt
+from app.user.services.profile_service import ProfileService
 
 user_bp = Blueprint("user_bp", __name__)
+
+proService = ProfileService()
 
 
 @user_bp.route("/", methods=["GET"])
@@ -44,4 +47,4 @@ def profile():
     """
     if not current_user.is_authenticated:
         return redirect("/")
-    return render_template("profile.html")
+    return jsonify(profile_details=proService.getProfileDetails(current_user.id))

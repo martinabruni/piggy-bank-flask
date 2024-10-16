@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 import random
+import click
 from flask import Flask
 
 from app.account.account_model import Account
 from app.category.category_model import Category
 from app.transaction.transaction_model import Transaction
+from app.user.user_model import User
 
 
 def add_db_commands(app: Flask):
@@ -41,103 +43,133 @@ def add_db_commands(app: Flask):
         db.drop_all()
         print("Database dropped!")
 
+    @app.cli.command("drop_table")
+    @click.argument("table_name")
+    def drop_table(table_name):
+        """
+        CLI command to drop a table by name.
+
+        Usage: flask drop_table <table_name>
+        """
+        # Mapping table names to their models
+        models = {
+            "account": Account,
+            "transaction": Transaction,
+            "category": Category,
+            "user": User,
+        }
+
+        # Get the model class dynamically
+        model = models.get(table_name.lower())
+
+        if model:
+            # Drop the table
+            model.__table__.drop(db.engine)
+            print(f"Table '{table_name}' dropped successfully!")
+        else:
+            print(
+                f"Table '{table_name}' not found. Available tables are: {', '.join(models.keys())}"
+            )
+
     @app.cli.command("db_seed")
     def db_seed():
-        # Define random categories
+        # Create 5 predefined categories
         categories = [
             "Food",
             "Entertainment",
             "Clothing",
             "Work",
             "Health",
-            "Education",
+            "Refund",
+            "Transfer",
         ]
 
-        # Create and seed categories if not already present
+        # Seed categories if not already present
         for category_name in categories:
             category = Category.query.filter_by(name=category_name).first()
             if not category:
-                category = Category(name=category_name)
+                if category_name == "Work" or category_name == "Refund":
+                    category = Category(name=category_name, is_income=True)
+                else:
+                    category = Category(name=category_name, is_income=False)
                 db.session.add(category)
 
+        # Commit categories to the database
         db.session.commit()
 
-        # Create accounts for the users
-        accounts = [
-            {
-                "name": "Bank Account",
-                "balance": round(random.uniform(500, 10000), 2),
-                "user_id": 1,
-            },
-            {
-                "name": "Credit Card",
-                "balance": round(random.uniform(-1000, 5000), 2),
-                "user_id": 1,
-            },
-            {
-                "name": "PayPal",
-                "balance": round(random.uniform(100, 5000), 2),
-                "user_id": 1,
-            },
-            {
-                "name": "Bank Account",
-                "balance": round(random.uniform(500, 10000), 2),
-                "user_id": 2,
-            },
-            {
-                "name": "Credit Card",
-                "balance": round(random.uniform(-1000, 5000), 2),
-                "user_id": 2,
-            },
-            {
-                "name": "PayPal",
-                "balance": round(random.uniform(100, 5000), 2),
-                "user_id": 2,
-            },
-        ]
+        # Fetch users to create accounts for them
+        users = User.query.all()
 
-        # Insert accounts into the database
-        for acc_data in accounts:
-            account = Account(
-                name=acc_data["name"],
-                balance=acc_data["balance"],
-                user_id=acc_data["user_id"],
-            )
-            db.session.add(account)
+        for user in users:
+            # Create 2 accounts for each user
+            accounts = [
+                {
+                    "name": f"{user.username}'s Bank Account",
+                    "initial_balance": round(random.uniform(500, 10000), 2),
+                    "user_id": user.id,
+                },
+                {
+                    "name": f"{user.username}'s Credit Card",
+                    "initial_balance": round(random.uniform(-1000, 5000), 2),
+                    "user_id": user.id,
+                },
+            ]
 
-        db.session.commit()  # Commit to get the account IDs
-
-        # Fetch the created accounts and categories
-        all_accounts = Account.query.all()
-        all_categories = Category.query.all()
-
-        # Generate random transactions for each account
-        for account in all_accounts:
-            # Number of transactions to generate per account
-            num_transactions = random.randint(5, 10)
-
-            for _ in range(num_transactions):
-                # Create a random transaction
-                amount = round(
-                    random.uniform(-500, 1500), 2
-                )  # Transaction can be expense or income
-                description = f"Random transaction for account {account.name}"
-                transaction_date = datetime.utcnow() - timedelta(
-                    days=random.randint(1, 365)
-                )  # Random date within the last year
-                category = random.choice(all_categories)
-
-                # Create and add the transaction
-                transaction = Transaction(
-                    amount=amount,
-                    date=transaction_date,
-                    description=description,
-                    user_id=account.user_id,
-                    account_id=account.id,
-                    category_id=category.id,
+            # Insert accounts into the database
+            for acc_data in accounts:
+                account = Account(
+                    name=acc_data["name"],
+                    initial_balance=acc_data["initial_balance"],
+                    user_id=acc_data["user_id"],
                 )
+                db.session.add(account)
 
-                db.session.add(transaction)
-
-        # Final commit for the transactions
+        # Commit accounts to the database
         db.session.commit()
+
+        print("Database seeded with users, accounts, and categories!")
+
+    @app.cli.command("db_add_transaction")
+    def db_add_transaction():
+        """
+        CLI command to add 2 transactions for each account of every user.
+        The transactions will have random amounts and dates within the last 30 days.
+        """
+        users = User.query.all()
+
+        # Fetch a random category to associate with transactions
+        categories = Category.query.all()
+
+        if not categories:
+            print("No categories available. Please seed categories first.")
+            return
+
+        for user in users:
+            for account in user.accounts:
+                for _ in range(2):  # Add 2 transactions per account
+                    description = f"Auto-generated transaction for {account.name}"
+                    transaction_date = datetime.utcnow() - timedelta(
+                        days=random.randint(1, 30)
+                    )  # Random date within last 30 days
+                    category = random.choice(categories)  # Choose a random category
+                    if category.name == "Work":
+                        amount = round(random.uniform(500, 1500), 2)  # Random amount
+                    else:
+                        amount = round(random.uniform(-1500, -0.01), 2)  # Random amount
+
+                    transaction = Transaction(
+                        amount=amount,
+                        date=transaction_date,
+                        description=description,
+                        user_id=user.id,
+                        account_id=account.id,
+                        category_id=category.id,
+                    )
+
+                    # Add transaction to session
+                    db.session.add(transaction)
+
+        # Commit all transactions
+        db.session.commit()
+
+        print("Added 2 transactions for each account of every user.")

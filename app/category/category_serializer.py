@@ -17,4 +17,4 @@ class CategorySchema(ma.Schema):
     """
 
     class Meta:
-        fields = ("id", "name")
+        fields = ("id", "name", "is_income")

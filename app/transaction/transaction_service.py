@@ -58,3 +58,31 @@ class TransactionService:
         """
         result = find_records_by_filter(Transaction, user_id=user_id, id=transaction_id)
         return self.__transactionSchema.dump(result[0])
+
+    def getTransactionsType(self, user_id: int, is_income_str: str):
+        """
+        Retrieves all transactions for a user based on the type (income or expense).
+
+        Args:
+            user_id (int): The ID of the user whose transactions are to be retrieved.
+            is_income (bool): If True, return transactions with positive amounts (income).
+                              If False, return transactions with negative amounts (expense).
+
+        Returns:
+            dict: Serialized data of filtered user transactions.
+        """
+
+        # Convert the string parameter to a boolean
+        is_income = is_income_str.lower() == "true"
+
+        # Determine the condition for amount based on is_income
+        amount_condition = (
+            Transaction.amount > 0 if is_income else Transaction.amount < 0
+        )
+
+        # Fetch transactions based on user_id and amount condition
+        transactions = Transaction.query.filter(
+            Transaction.user_id == user_id, amount_condition
+        ).all()
+
+        return self.__transactionsSchema.dump(transactions)
