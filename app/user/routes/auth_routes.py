@@ -2,7 +2,7 @@ from app import bcrypt
 from flask import Blueprint, jsonify, make_response, render_template, request
 from flask_login import current_user
 
-from app.user.auth_service import AuthService
+from app.user.services.auth_service import AuthService
 from app.user.forms.login_form import LoginForm
 from app.user.forms.registration_form import RegistrationForm
 

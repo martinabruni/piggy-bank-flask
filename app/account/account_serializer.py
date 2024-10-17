@@ -19,4 +19,4 @@ class AccountSchema(ma.Schema):
     """
 
     class Meta:
-        fields = ("id", "name", "balance", "user_id")
+        fields = ("id", "name", "balance", "user_id", "initial_balance")

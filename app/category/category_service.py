@@ -56,3 +56,8 @@ class CategoryService:
         """
         category = find_record_by_id(Category, category_id)
         return self.__categorySchema.dump(category)
+
+    def getCategoriesType(self, is_income_str: str):
+        is_income = is_income_str.lower() == "true"
+        income_categories = find_records_by_filter(Category, is_income=is_income)
+        return self.__categoriesSchema.dump(income_categories)

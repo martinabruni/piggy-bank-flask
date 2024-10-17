@@ -24,7 +24,7 @@ def transactions():
     """
     if current_user.is_authenticated:
         return jsonify(
-            user_accounts=transactionService.getUserTransactions(current_user.id)
+            user_transactions=transactionService.getUserTransactions(current_user.id)
         )
     else:
         return jsonify(error="User is not authenticated"), 401
@@ -44,8 +44,21 @@ def transaction(transaction_id: int):
     """
     if current_user.is_authenticated:
         return jsonify(
-            user_accounts=transactionService.getThisUserTransaction(
+            user_transactions=transactionService.getThisUserTransaction(
                 current_user.id, transaction_id=transaction_id
+            )
+        )
+    else:
+        return jsonify(error="User is not authenticated"), 401
+
+
+@transaction_bp.route("/transactions/is_income/<string:is_income>", methods=["GET"])
+def transactions_type(is_income: str):
+    if current_user.is_authenticated:
+
+        return jsonify(
+            user_transactions=transactionService.getTransactionsType(
+                current_user.id, is_income
             )
         )
     else:

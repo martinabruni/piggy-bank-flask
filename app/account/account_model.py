@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class Account(db.Model):
@@ -15,5 +16,13 @@ class Account(db.Model):
     __tablename__ = "account"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    balance = db.Column(db.Float, default=0.0)
+    initial_balance = db.Column(db.Float, default=0.0)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    transactions = db.relationship("Transaction", backref="account", lazy="dynamic")
+
+    @hybrid_property
+    def balance(self):
+        return self.initial_balance + sum(
+            transaction.amount for transaction in self.transactions.all()
+        )
