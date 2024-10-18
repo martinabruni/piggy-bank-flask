@@ -1,17 +1,9 @@
 from flask import (
     Blueprint,
-    app,
-    current_app,
     redirect,
-    render_template,
-    request,
     jsonify,
 )
-from flask_login import current_user, login_required, logout_user
-from app.user.forms.login_form import LoginForm
-from app.user.forms.registration_form import RegistrationForm
-from app.user.services.auth_service import AuthService
-from app import bcrypt
+from flask_login import current_user
 from app.user.services.profile_service import ProfileService
 
 user_bp = Blueprint("user_bp", __name__)
@@ -31,8 +23,8 @@ def index():
         Redirect response to either /login or /profile.
     """
     if not current_user.is_authenticated:
-        return redirect("/login")
-    return redirect("/profile")
+        return redirect("/html/login")
+    return redirect("/html/profile")
 
 
 @user_bp.route("/profile", methods=["GET"])
@@ -46,5 +38,15 @@ def profile():
         Rendered template of the profile page.
     """
     if not current_user.is_authenticated:
-        return redirect("/")
-    return jsonify(profile_details=proService.getProfileDetails(current_user.id))
+        return jsonify(
+            {
+                "message": "You must be logged in",
+                "success": False,
+                "redirect": "/",
+            }
+        )
+    return jsonify(
+        profile_details=proService.getProfileDetails(current_user.id),
+        success=True,
+        redirect="/html/profile",
+    )

@@ -1,5 +1,5 @@
 from app import bcrypt
-from flask import Blueprint, jsonify, make_response, render_template, request
+from flask import Blueprint, jsonify, request
 from flask_login import current_user
 
 from app.user.services.auth_service import AuthService
@@ -11,13 +11,12 @@ auth_bp = Blueprint("auth_bp", __name__)
 auth_service = AuthService(bcrypt)
 
 
-@auth_bp.route("/register", methods=["POST", "GET"])
+@auth_bp.route("/register", methods=["POST"])
 def register():
     """
     Endpoint to register a new user.
 
-    Handles both GET and POST requests:
-        - GET request renders the registration form.
+    Handles POST requests:
         - POST request processes the form data, validates it, and registers the user.
 
     POST Data:
@@ -29,27 +28,37 @@ def register():
         JSON response with the registration status and username if successful,
         or form errors if validation fails.
     """
-    if request.method == "GET":
-        return render_template("register.html")
-    else:
-        form = RegistrationForm(request.form)
+    form = RegistrationForm(request.form)
 
-        # Validate and process the registration form
-        if form.validate_on_submit():
-            user = auth_service.register_user(
-                form.username.data, form.email.data, form.pwd.data
-            )
-            return (
-                jsonify(
-                    {"message": "User registered successfully", "user": user.username}
-                ),
-                201,
-            )
+    # Validate and process the registration form
+    if form.validate_on_submit():
+        user = auth_service.register_user(
+            form.username.data, form.email.data, form.pwd.data
+        )
+        return (
+            jsonify(
+                {
+                    "message": "User registered successfully",
+                    "user": user.username,
+                    "success": True,
+                    "redirect": "/html/profile",
+                }
+            ),
+            201,
+        )
+    return (
+        jsonify(
+            {
+                "message": form.errors,
+                "success": False,
+                "redirect": "/",
+            }
+        ),
+        400,
+    )
 
-        return jsonify({"errors": form.errors}), 400
 
-
-@auth_bp.route("/login", methods=["POST", "GET"])
+@auth_bp.route("/login", methods=["POST"])
 def login():
     """
     Endpoint to log in a user.
@@ -67,25 +76,45 @@ def login():
         - Success: Message indicating login success.
         - Failure: Message indicating invalid credentials.
     """
-    if request.method == "GET":
-        return render_template("login.html")
-    else:
-        if current_user.is_authenticated:
-            return jsonify(message="You are already logged in"), 400
-        form = LoginForm(request.form)
+    if current_user.is_authenticated:
+        auth_service.logout()
+    form = LoginForm(request.form)
+    # Validate and process the login form
+    if form.validate_on_submit():
+        user = auth_service.authenticate_user(form.email.data, form.pwd.data)
+        if user:
+            auth_service.login(user)
+            return (
+                jsonify(
+                    {
+                        "message": "Logged in successfully",
+                        "success": True,
+                        "redirect": "/html/profile",
+                    }
+                ),
+                200,
+            )
+        return (
+            jsonify(
+                {
+                    "message": "Invalid email or password",
+                    "success": False,
+                    "redirect": "/",
+                }
+            ),
+            401,
+        )
 
-        # Validate and process the login form
-        if form.validate_on_submit():
-            user = auth_service.authenticate_user(form.email.data, form.pwd.data)
-            if user:
-                auth_service.login(user)
-                return (
-                    jsonify({"message": "Logged in successfully"}),
-                    200,
-                )
-            return jsonify({"message": "Invalid email or password"}), 401
-
-        return jsonify({"errors": form.errors}), 400
+    return (
+        jsonify(
+            {
+                "message": form.errors,
+                "success": False,
+                "redirect": "/",
+            }
+        ),
+        400,
+    )
 
 
 @auth_bp.route("/logout", methods=["POST"])
@@ -102,9 +131,27 @@ def logout():
         - Failure: Message indicating the user needs to be logged in to log out.
     """
     if not current_user.is_authenticated:
-        return jsonify({"message": "You must be logged in to logout"}), 400
+        return (
+            jsonify(
+                {
+                    "message": "You must be logged in to logout",
+                    "success": False,
+                    "redirect": "/",
+                }
+            ),
+            400,
+        )
     auth_service.logout()
-    return jsonify({"message": "Logged out successfully"}), 200
+    return (
+        jsonify(
+            {
+                "message": "Logged out successfully",
+                "success": True,
+                "redirect": "/",
+            }
+        ),
+        200,
+    )
 
 
 @auth_bp.route("/delete_user", methods=["DELETE"])
@@ -121,6 +168,24 @@ def delete_user():
             - Failure: An error message if the user is not logged in.
     """
     if not current_user.is_authenticated:
-        return jsonify({"message": "You must be logged in"}), 400
+        return (
+            jsonify(
+                {
+                    "message": "You must be logged in",
+                    "success": False,
+                    "redirect": "/",
+                }
+            ),
+            400,
+        )
     auth_service.delete_user(current_user.email)
-    return jsonify({"message": "User deleted successfully"}), 200
+    return (
+        jsonify(
+            {
+                "message": "User deleted successfully",
+                "success": True,
+                "redirect": "/",
+            }
+        ),
+        200,
+    )

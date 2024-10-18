@@ -16,9 +16,9 @@ from flask_login import (
 )
 from flask_marshmallow import Marshmallow
 
-# from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect
 
-# csrf = CSRFProtect()
+csrf = CSRFProtect()
 
 # Load environment variables
 load_dotenv()
@@ -80,16 +80,18 @@ def create_app(config_name="development"):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     ma.init_app(app=app)
+    csrf.init_app(app)
+
     from app.utils.db_commands import add_db_commands
 
     add_db_commands(app=app)
-    # csrf.init_app(app)
 
     from .account import account_routes
     from .transaction import transaction_routes
     from .category import category_routes
     from .user.routes import user_routes
     from .user.routes import auth_routes
+    from app.user.routes import user_templates_routes
 
     # Registering blueprints
     app.register_blueprint(account_routes.account_bp)
@@ -97,5 +99,6 @@ def create_app(config_name="development"):
     app.register_blueprint(transaction_routes.transaction_bp)
     app.register_blueprint(user_routes.user_bp)
     app.register_blueprint(auth_routes.auth_bp)
+    app.register_blueprint(user_templates_routes.user_templates_bp)
 
     return app
