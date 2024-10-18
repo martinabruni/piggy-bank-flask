@@ -1,6 +1,6 @@
 from app.account.account_model import Account
 from app.account.account_serializer import AccountSchema
-from app.utils.db_utils import find_records_by_filter
+from app.utils.db_utils import find_records_by_filter, add_record, delete_record, find_record_by_id
 
 
 class AccountService:
@@ -59,3 +59,43 @@ class AccountService:
         """
         result = find_records_by_filter(Account, user_id=user_id, id=account_id)
         return self.__accountSchema.dump(result[0])
+
+    def createAccount(self, user_id: int, name: str, initial_balance: float):
+        """
+        Creates a new financial account for the specified user.
+
+        Args:
+            user_id (int): The ID of the user who owns the account.
+            name (str): The name of the new account.
+            initial_balance (float): The starting balance for the account.
+
+        Returns:
+            dict: The serialized account data of the newly created account.
+        """
+        new_account = Account(
+            name=name,
+            initial_balance=initial_balance,
+            user_id=user_id
+        )
+
+        add_record(new_account)
+
+        return self.accountSchema.dump(new_account)
+    
+    def deleteAccount(self,user_id, account_id):
+        """
+        Deletes an account if it belongs to the user.
+
+        Args:
+            user_id (int): ID of the user requesting the deletion.
+            account_id (int): ID of the account to be deleted.
+
+        Returns:
+            bool: True if account deletion was successful, False otherwise.
+        """
+        account = (find_records_by_filter(Account, user_id=user_id, id=account_id))[0]
+
+        if account:
+            delete_record(account)
+            return True
+        return False

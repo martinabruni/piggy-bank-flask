@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, redirect
+from flask import Blueprint, jsonify, redirect, request
+from app.account.account_form import AccountForm
 from flask_login import current_user
 
 from app.account.account_service import AccountService
@@ -47,3 +48,46 @@ def account(account_id: int):
         )
     else:
         return jsonify(error="User is not authenticated"), 401
+    
+    
+@account_bp.route("/account/new", methods=["POST"])
+def new_account():
+    form = AccountForm(request.form)
+
+    if not current_user.is_authenticated:
+        return jsonify({"error": "User is not authenticated"}), 401
+
+    if form.validate_on_submit():
+        form_data = form.data  
+        account_name = form_data.get('name')
+        initial_balance = form_data.get('initial_balance') or 0.0
+
+        
+        new_account = accountService.createAccount(
+            user_id=current_user.id,
+            name=account_name,
+            initial_balance=initial_balance
+        )
+
+        if new_account:
+            return jsonify({
+                "message": "Account created successfully",
+                "account": new_account
+            }), 201
+        else:
+            return jsonify({"error": "Account creation failed"}), 500
+
+    return jsonify({"errors": form.errors}), 400
+
+
+@account_bp.route("/account/delete/<int:account_id>", methods=["DELETE"])
+def delete_account(account_id: int):
+    if not current_user.is_authenticated:
+        return jsonify({"error": "User is not authenticated"}), 401
+
+    success = accountService.deleteAccount(user_id=current_user.id, account_id=account_id)
+
+    if success:
+        return jsonify({"message": "Account deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Account deletion failed"}), 500
