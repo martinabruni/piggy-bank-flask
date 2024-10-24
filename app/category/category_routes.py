@@ -42,11 +42,3 @@ def category(category_id: int):
         return jsonify(category=catService.getThisCategory(category_id=category_id))
     else:
         return jsonify(error="User is not authenticated"), 401
-
-
-@category_bp.route("/categories/is_income/<string:is_income>", methods=["GET"])
-def category_type(is_income: str):
-    if current_user.is_authenticated:
-        return jsonify(categories=catService.getCategoriesType(is_income))
-    else:
-        return jsonify(error="User is not authenticated"), 401

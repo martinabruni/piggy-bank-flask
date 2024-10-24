@@ -88,10 +88,7 @@ def add_db_commands(app: Flask):
         for category_name in categories:
             category = Category.query.filter_by(name=category_name).first()
             if not category:
-                if category_name == "Work" or category_name == "Refund":
-                    category = Category(name=category_name, is_income=True)
-                else:
-                    category = Category(name=category_name, is_income=False)
+                category = Category(name=category_name)
                 db.session.add(category)
 
         # Commit categories to the database
@@ -152,10 +149,11 @@ def add_db_commands(app: Flask):
                         days=random.randint(1, 30)
                     )  # Random date within last 30 days
                     category = random.choice(categories)  # Choose a random category
-                    if category.name == "Work":
-                        amount = round(random.uniform(500, 1500), 2)  # Random amount
+                    amount = round(random.uniform(-1500, 1500), 2)  # Random amount
+                    if amount > 0:
+                        is_income = True
                     else:
-                        amount = round(random.uniform(-1500, -0.01), 2)  # Random amount
+                        is_income = False
 
                     transaction = Transaction(
                         amount=amount,
@@ -164,6 +162,7 @@ def add_db_commands(app: Flask):
                         user_id=user.id,
                         account_id=account.id,
                         category_id=category.id,
+                        is_income=is_income,
                     )
 
                     # Add transaction to session

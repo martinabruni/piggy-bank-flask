@@ -71,18 +71,6 @@ class TransactionService:
         Returns:
             dict: Serialized data of filtered user transactions.
         """
-
-        # Convert the string parameter to a boolean
         is_income = is_income_str.lower() == "true"
-
-        # Determine the condition for amount based on is_income
-        amount_condition = (
-            Transaction.amount > 0 if is_income else Transaction.amount < 0
-        )
-
-        # Fetch transactions based on user_id and amount condition
-        transactions = Transaction.query.filter(
-            Transaction.user_id == user_id, amount_condition
-        ).all()
-
-        return self.__transactionsSchema.dump(transactions)
+        income_transactions = find_records_by_filter(Transaction, is_income=is_income)
+        return self.__transactionsSchema.dump(income_transactions)
