@@ -31,4 +31,5 @@ class TransactionSchema(ma.Schema):
             "user_id",
             "account_id",
             "category_id",
+            "is_income",
         )
